@@ -392,12 +392,12 @@ if __name__=="__main__":
                 plot_decision_boundary(model2, x,y)
                 st.pyplot()
                 st.header("Mean Decision Boundary after MC DropOut")
-                plot_mean_contour(model2, x, iterations, x[:, 0], x[:, 1], y)
+                plot_mean_contour(model2, x, iterations)
                 st.pyplot()
                 # plot_mean_contour(model2, int(x[:,0].min())-1, int(x[:,0].max())+1, int(x[:,1].min())-1, int(x[:,1].max())+1, iterations)
                 # st.pyplot()
                 st.header("Standard Deviation after MC DropOut")
-                plot_std_contour(model2, x, iterations, x[:, 0], x[:, 1], y)
+                plot_std_contour(model2, x, iterations)
                 st.pyplot()
                 
                 st.session_state["circle"] = False
