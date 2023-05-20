@@ -10,6 +10,7 @@ from torch.nn import BCEWithLogitsLoss, CrossEntropyLoss
 from tqdm import trange
 import streamlit as st
 from mcdropout_helper import enable_dropout, plot_decision_boundary, accuracy_fn, plot_mean_contour, plot_std_contour, plot_mean_contour_iris, plot_std_contour_iris
+from mcdropout_helper import custom_calibration_curve, plot_reliability_curve
 
 st.set_option('deprecation.showPyplotGlobalUse', False)
 
@@ -237,6 +238,10 @@ if __name__=="__main__":
                 st.header("Standard Deviation after MC DropOut")
                 plot_std_contour(model2, x, iterations, x[:, 0], x[:, 1], y)
                 st.pyplot()
+                st.header("Reliability Curve")
+                positives, mean_prob = custom_calibration_curve(y, model2(x))
+                plot_reliability_curve(mean_prob, positives)
+                st.pyplot()
                 
                 st.session_state["circle"] = False
                 st.session_state["blobs"] = False
@@ -330,7 +335,7 @@ if __name__=="__main__":
                 st.header("Standard Deviation after MC DropOut")
                 plot_std_contour_iris(iris_model, x, iterations, x[:, 0], x[:, 1], y)
                 st.pyplot()
-                
+
                 st.session_state["circle"] = False
                 st.session_state["blobs"] = False
                 st.session_state["generate"] = False
