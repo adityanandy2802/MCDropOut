@@ -3,12 +3,46 @@ import numpy as np
 from tqdm import trange
 import matplotlib.pyplot as plt
 plt.style.use("ggplot")
+from statistics import mean
 
 def enable_dropout(model):
     """ Function to enable the dropout layers during test-time """
     for m in model.modules():
         if m.__class__.__name__.startswith('Dropout'):
             m.train()
+
+def custom_calibration_curve(y_test, y_prob, n_bins = 10):
+  y_test = y_test.detach().numpy()
+  y_prob = y_prob.detach().numpy()
+  positives = []
+  mean_prob = []
+  for i in range(n_bins):
+    idx = []
+    test = []
+    prob = []
+    for j in range(len(y_prob)):
+      if (y_prob[j] <= float(i+1)/n_bins and y_prob[j] >= float(i)/n_bins):
+        idx.append(j)
+    if len(idx) == 0:
+      continue
+    for k in idx:
+      test.append(y_test[k])
+      prob.append(float(y_prob[k]))
+    proba = float(test.count(1))/len(idx)
+    positives.append(proba)
+    mean_ = mean(prob)
+    mean_prob.append(mean_)
+  return positives, mean_prob
+
+def plot_reliability_curve(mean_pred, positives):
+  plt.plot(mean_pred, positives, 's-', label='Model Calibration')
+  plt.plot([0, 1], [0, 1], '--', label='Perfect Calibration')
+
+  plt.xlabel('Mean Predicted Value')
+  plt.ylabel('Fraction of Positives')
+  plt.title('Reliability Curve')
+  plt.legend()
+  plt.show()
 
 def mc_dropout_vis(model_non_linear, x, y_noisy, iterations, linear = False):
   # iterations = 100
