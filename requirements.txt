@@ -1,5 +1,6 @@
 scikit-learn
 matplotlib
+statistics
 torch
 numpy
 tqdm
