@@ -6,6 +6,8 @@ from torch.nn import L1Loss, MSELoss
 import numpy as np
 import matplotlib.pyplot as plt
 plt.style.use("ggplot")
+import plotly.express as px
+import plotly.graph_objects as go
 from tqdm import trange
 import streamlit as st
 from mcdropout_helper import enable_dropout, mc_dropout_vis
@@ -60,50 +62,40 @@ txt2 = "Almost There..."
 txt3 = "Done!"
 
 if __name__=="__main__":
-    with st.sidebar:
-        st.markdown("<h1 style= 'text-align : center;'>Menu</h1>", unsafe_allow_html = True)
-        Linear = st.button("Linear", use_container_width = True)
-        NonLinear = st.button("Non-Linear", use_container_width = True)
-        Generate = st.button("Generate", use_container_width = True, type = "primary")
-        Train = st.button("Train", use_container_width = True, type = "primary")
+    regressions = ["line", "sine", "exponential"]
+    regression = st.multiselect("Select regression: ", regressions, max_selections = 1)
+    Train = st.button("Train", use_container_width = True, type = "primary")
 
-    if "linear" not in st.session_state:
-        st.session_state["linear"] = False
-    if "nonlinear" not in st.session_state:
-        st.session_state["nonlinear"] = False
+    if "line" not in st.session_state:
+        st.session_state["line"] = False
+    if "sine" not in st.session_state:
+        st.session_state["sine"] = False
+    if "exp" not in st.session_state:
+        st.session_state["exp"] = False
     if "train" not in st.session_state:
        st.session_state["train"] = False
-    if "generate" not in st.session_state:
-       st.session_state["generate"] = False
+    
+    if regression == ["line"]:
+        st.session_state["line"] = True
+    if regression == ["sine"]:
+        st.session_state["sine"] = True
+    if regression == ["exp"]:
+        st.session_state["exp"] = True
 
-    if Linear:
-        st.session_state["linear"] = True
-        st.session_state["nonlinear"] = False
-    if NonLinear:
-        st.session_state["linear"] = False
-        st.session_state["nonlinear"] = True
-    if st.session_state["linear"] or st.session_state["nonlinear"]:
-       if Generate:
-          st.session_state["generate"] = True
-    if st.session_state["generate"]:
-       if Train:
-          st.session_state["train"] = True
+    if Train:
+        st.session_state["train"] = True
 
-    if st.session_state["linear"]:
-        st.header("Linear Dataset")
+    if st.session_state["line"]:
+        st.header("Line")
         samples = st.slider("Samples", 0, 10000)
-        if st.session_state["generate"]:
+
+        if st.session_state["train"]:
             x, y = make_regression(n_samples=samples, n_features=1, noise=10)
 
             # Plot the generated dataset
-            plt.scatter(x, y, s=10, color = "black", alpha = 0.2)
-            plt.xlabel('X')
-            plt.ylabel('Y')
-            plt.title('Generated Dataset')
-            plt.show()
-            st.pyplot()
+            fig = px.scatter(x = X[:, 0], y = X[:, 1], color = y)
+            st.plotly_chart(fig, use_container_width = False)
 
-        if st.session_state["train"]:
             train_ratio = 0.8
             val_ratio = 0.1
             test_ratio =0.1
@@ -136,46 +128,46 @@ if __name__=="__main__":
                         my_bar.progress(int((epoch+1)*100/epochs), text = txt2)
                     else:
                         my_bar.progress(int((epoch+1)*100/epochs), text = txt3)
+
             mc_dropout_vis(model_with_dropout, x, y, 100, True)
             st.pyplot()
+
             st.session_state["train"] = False
             st.session_state["generate"] = False
             st.session_state["linear"] = False
             st.session_state["nonlinear"] = False
 
-    if st.session_state["nonlinear"]:
-        st.header("Non Linear Dataset")
-        option = []
-        options = ["Sine", "Exponential"]
-        option = st.multiselect("Select", options, max_selections = 1)
-        
-        if option == ["Sine"]:
+    if st.session_state["sine"] or st.session_state["exp"]:        
+        if st.session_state["sine"]:
           k = st.slider("Choose constant", 0, 10)
           n = st.slider("Choose noise", 0.0, 5.0, step = 0.1)
-          if st.session_state["generate"]:
-              x = np.linspace(0, 2*np.pi, 100)  # X values from 0 to 2*pi
-              y = k * np.sin(x)  # Corresponding Y values for the sine curve
-
-              # Add random noise
-              noise = np.random.normal(0, n, 100)  # Generate 100 random numbers from a normal distribution with mean 0 and standard deviation 0.1
-              y_noisy = y + noise  # Add noise to the original sine curve
-
-              # Plot the sine curve with noise
-              plt.plot(x, y_noisy, label='Sine Curve with Noise')
-              plt.plot(x, y, linestyle='--', color='r', label='Sine Curve')  # Plot the original sine curve as a reference
-              plt.xlabel('X')
-              plt.ylabel('Y')
-              plt.title('Sine Curve with Noise')
-              plt.legend()
-              plt.grid(True)
-              plt.show()
-              st.pyplot()
               
-        if option == ["Exponential"]:
+        if st.session_state["exp"]:
             r = st.slider("Choose range", 0, 10)
             k = st.slider("Choose constant", 0, 10)
             n = st.slider("Choose noise", 0.0, 5.0, step = 0.1)
-            if st.session_state["generate"]:
+            
+        if st.session_state["train"]:
+            if st.session_state["sine"]:
+                x = np.linspace(0, 2*np.pi, 100)  # X values from 0 to 2*pi
+                y = k * np.sin(x)  # Corresponding Y values for the sine curve
+
+                # Add random noise
+                noise = np.random.normal(0, n, 100)  # Generate 100 random numbers from a normal distribution with mean 0 and standard deviation 0.1
+                y_noisy = y + noise  # Add noise to the original sine curve
+
+                # Plot the sine curve with noise
+                plt.plot(x, y_noisy, label='Sine Curve with Noise')
+                plt.plot(x, y, linestyle='--', color='r', label='Sine Curve')  # Plot the original sine curve as a reference
+                plt.xlabel('X')
+                plt.ylabel('Y')
+                plt.title('Sine Curve with Noise')
+                plt.legend()
+                plt.grid(True)
+                plt.show()
+                st.pyplot()
+            
+            if st.session_state["exp"]:
                 x = np.linspace(0, r, 100)
 
                 # Generate y values with exponential curve and added noise
@@ -195,7 +187,7 @@ if __name__=="__main__":
                 # Show the plot
                 plt.show()
                 st.pyplot()
-        if st.session_state["train"]:
+            
             model_non_linear = regression_non_linear(1,1)
             lossfn =  MSELoss()
             optim = torch.optim.Adam(model_non_linear.parameters(), lr=1e-3)
@@ -218,6 +210,7 @@ if __name__=="__main__":
                         my_bar.progress(int((epoch+1)*100/epochs), text = txt3)
             mc_dropout_vis(model_non_linear, x, y_noisy, 100)
             st.pyplot()
+
             st.session_state["train"] = False
             st.session_state["generate"] = False
             st.session_state["linear"] = False
