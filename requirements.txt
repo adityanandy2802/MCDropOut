@@ -3,4 +3,5 @@ matplotlib
 torch
 numpy
 tqdm
+plotly
 streamlit
