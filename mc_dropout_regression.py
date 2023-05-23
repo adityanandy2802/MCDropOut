@@ -87,7 +87,7 @@ if __name__=="__main__":
         st.session_state["line"] = False
         st.session_state["sine"] = True
         st.session_state["exp"] = False
-    if regression == ["exp"]:
+    if regression == ["exponential"]:
         st.header("Exponential")
         r = st.slider("Choose range", 0, 10)
         k = st.slider("Choose constant", 0, 10)
