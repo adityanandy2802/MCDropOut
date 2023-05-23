@@ -64,7 +64,6 @@ txt3 = "Done!"
 if __name__=="__main__":
     regressions = ["line", "sine", "exponential"]
     regression = st.multiselect("Select regression: ", regressions, max_selections = 1)
-    Train = st.button("Train", use_container_width = True, type = "primary")
 
     if "line" not in st.session_state:
         st.session_state["line"] = False
@@ -76,31 +75,40 @@ if __name__=="__main__":
        st.session_state["train"] = False
     
     if regression == ["line"]:
+        st.header("Line")
+        samples = st.slider("Samples", 0, 10000)
         st.session_state["line"] = True
         st.session_state["sine"] = False
         st.session_state["exp"] = False
     if regression == ["sine"]:
+        st.header("Sine")
+        k = st.slider("Choose constant", 0, 10)
+        n = st.slider("Choose noise", 0.0, 5.0, step = 0.1)
         st.session_state["line"] = False
         st.session_state["sine"] = True
         st.session_state["exp"] = False
     if regression == ["exp"]:
+        st.header("Exponential")
+        r = st.slider("Choose range", 0, 10)
+        k = st.slider("Choose constant", 0, 10)
+        n = st.slider("Choose noise", 0.0, 5.0, step = 0.1)
         st.session_state["line"] = False
         st.session_state["sine"] = False
         st.session_state["exp"] = True
+    
+    Train = st.button("Train", use_container_width = True, type = "primary")
 
     if Train:
         st.session_state["train"] = True
 
     if st.session_state["line"]:
-        st.header("Line")
-        samples = st.slider("Samples", 0, 10000)
-
         if st.session_state["train"]:
             x, y = make_regression(n_samples=samples, n_features=1, noise=10)
 
             # Plot the generated dataset
-            fig = px.scatter(x = X[:, 0], y = X[:, 1], color = y)
-            st.plotly_chart(fig, use_container_width = False)
+            plt.scatter(x = x, y = y, color = "black", s = 10, alpha = 0.1)
+            plt.show()
+            st.pyplot()
 
             train_ratio = 0.8
             val_ratio = 0.1
@@ -143,19 +151,9 @@ if __name__=="__main__":
             st.session_state["linear"] = False
             st.session_state["nonlinear"] = False
 
-    if st.session_state["sine"] or st.session_state["exp"]:        
-        if st.session_state["sine"]:
-            k = st.slider("Choose constant", 0, 10)
-            n = st.slider("Choose noise", 0.0, 5.0, step = 0.1)
-              
-        if st.session_state["exp"]:
-            r = st.slider("Choose range", 0, 10)
-            k = st.slider("Choose constant", 0, 10)
-            n = st.slider("Choose noise", 0.0, 5.0, step = 0.1)
-
+    if st.session_state["sine"] or st.session_state["exp"]:
         if st.session_state["train"]:
             if st.session_state["sine"]:
-                st.header("Sine")
                 x = np.linspace(0, 2*np.pi, 100)  # X values from 0 to 2*pi
                 y = k * np.sin(x)  # Corresponding Y values for the sine curve
 
@@ -175,7 +173,6 @@ if __name__=="__main__":
                 st.pyplot()
             
             if st.session_state["exp"]:
-                st.header("Exponential")
                 x = np.linspace(0, r, 100)
 
                 # Generate y values with exponential curve and added noise
