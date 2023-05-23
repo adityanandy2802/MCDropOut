@@ -95,7 +95,7 @@ if __name__=="__main__":
         st.session_state["line"] = False
         st.session_state["sine"] = False
         st.session_state["exp"] = True
-    
+    iterations = st.slider("MC Dropout Iterations", 0 ,500)
     Train = st.button("Train", use_container_width = True, type = "primary")
 
     if Train:
@@ -143,7 +143,7 @@ if __name__=="__main__":
                     else:
                         my_bar.progress(int((epoch+1)*100/epochs), text = txt3)
 
-            mc_dropout_vis(model_with_dropout, x, y, 100, True)
+            mc_dropout_vis(model_with_dropout, x, y, iterations, True)
             st.pyplot()
 
             st.session_state["train"] = False
@@ -213,7 +213,7 @@ if __name__=="__main__":
                         my_bar.progress(int((epoch+1)*100/epochs), text = txt2)
                     else:
                         my_bar.progress(int((epoch+1)*100/epochs), text = txt3)
-            mc_dropout_vis(model_non_linear, x, y_noisy, 100)
+            mc_dropout_vis(model_non_linear, x, y_noisy, iterations)
             st.pyplot()
 
             st.session_state["train"] = False
