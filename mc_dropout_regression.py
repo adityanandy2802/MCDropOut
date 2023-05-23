@@ -77,9 +77,15 @@ if __name__=="__main__":
     
     if regression == ["line"]:
         st.session_state["line"] = True
+        st.session_state["sine"] = False
+        st.session_state["exp"] = False
     if regression == ["sine"]:
+        st.session_state["line"] = False
         st.session_state["sine"] = True
+        st.session_state["exp"] = False
     if regression == ["exp"]:
+        st.session_state["line"] = False
+        st.session_state["sine"] = False
         st.session_state["exp"] = True
 
     if Train:
@@ -139,16 +145,17 @@ if __name__=="__main__":
 
     if st.session_state["sine"] or st.session_state["exp"]:        
         if st.session_state["sine"]:
-          k = st.slider("Choose constant", 0, 10)
-          n = st.slider("Choose noise", 0.0, 5.0, step = 0.1)
+            k = st.slider("Choose constant", 0, 10)
+            n = st.slider("Choose noise", 0.0, 5.0, step = 0.1)
               
         if st.session_state["exp"]:
             r = st.slider("Choose range", 0, 10)
             k = st.slider("Choose constant", 0, 10)
             n = st.slider("Choose noise", 0.0, 5.0, step = 0.1)
-            
+
         if st.session_state["train"]:
             if st.session_state["sine"]:
+                st.header("Sine")
                 x = np.linspace(0, 2*np.pi, 100)  # X values from 0 to 2*pi
                 y = k * np.sin(x)  # Corresponding Y values for the sine curve
 
@@ -168,6 +175,7 @@ if __name__=="__main__":
                 st.pyplot()
             
             if st.session_state["exp"]:
+                st.header("Exponential")
                 x = np.linspace(0, r, 100)
 
                 # Generate y values with exponential curve and added noise
